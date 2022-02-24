@@ -6,7 +6,7 @@ function Header() {
         <header className='flex items-center justify-between p-5 mx-auto max-w-7xl'>
             <div className='flex flex-row items-center space-x-5'>
                 <Link href='/' >
-                    <img src="https://links.papareact.com/yvf" alt="" className='object-contain cursor-pointer w-44' />
+                    <img src='/Logo.jpg' alt='' className='object-contain h-20 cursor-pointer w-44' />
                 </Link>
                 <div className='items-center hidden space-x-5 md:inline-flex'>
                     <h3>About</h3>
