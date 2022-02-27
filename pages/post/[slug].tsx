@@ -4,10 +4,23 @@ import Header from '../../components/Header'
 import { sanityClient, urlFor } from '../../sanity'
 import { Post } from '../typing'
 import PortableText from 'react-portable-text'
+import { useForm, SubmitHandler } from 'react-hook-form'
+
+interface IFormInput {
+  _id: string
+  name: string
+  email: string
+  comment: string
+}
 interface Props {
   post: Post
 }
 function Post({ post }: Props) {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<IFormInput>()
   return (
     <main>
       <Header />
@@ -56,6 +69,42 @@ function Post({ post }: Props) {
           />
         </div>
       </article>
+      <hr className="max-w-lg mx-auto my-5 border border-yellow-500" />
+
+      <form className="flex flex-col max-w-2xl p-5 mx-auto my-10 mb-10">
+        <h3 className="text-sm text-yellow-500">Enjoy this article?</h3>
+        <h4 className="text-3xl font-bold">Leave a comment below</h4>
+        <hr className="py-3 mt-2" />
+
+        <input type="hidden" {...register('_id')} name="_id" value={post._id} />
+        <label className="block mb-5 ">
+          <span className="text-gray-700">Name</span>
+          <input
+            {...register('name', { required: true })}
+            type="text"
+            placeholder="Want to know you opinion "
+            className="block w-full px-3 py-2 mt-1 border rounded shadow outline-none form-input ring-yellow-500 focus:ring"
+          />
+        </label>
+        <label className="block mb-5 ">
+          <span className="text-gray-700">Email</span>
+          <input
+            {...register('email', { required: true })}
+            type="text"
+            placeholder="Want to know you opinion "
+            className="block w-full px-3 py-2 mt-1 border rounded shadow outline-none form-input ring-yellow-500 focus:ring"
+          />
+        </label>
+        <label className="block mb-5 ">
+          <span className="text-gray-700">Comments</span>
+          <textarea
+            {...register('comment', { required: true })}
+            placeholder="know sometings"
+            rows={8}
+            className="w-full px-3 py-2 mt-1 border rounded shadow outline-none form-textarea ring-yellow-500 focus:ring "
+          />
+        </label>
+      </form>
     </main>
   )
 }
