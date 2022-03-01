@@ -1,5 +1,5 @@
 import { GetStaticProps } from 'next'
-import React from 'react'
+import React, { useState } from 'react'
 import Header from '../../components/Header'
 import { sanityClient, urlFor } from '../../sanity'
 import { Post } from '../typing'
@@ -16,6 +16,7 @@ interface Props {
   post: Post
 }
 function Post({ post }: Props) {
+  const [submitted, setSubmitted] = useState(false)
   const {
     register,
     handleSubmit,
@@ -29,11 +30,14 @@ function Post({ post }: Props) {
     })
       .then(() => {
         console.log(data)
+        setSubmitted(true)
       })
       .catch((err) => {
         console.log(err)
+        setSubmitted(false)
       })
   }
+  console.log(post)
   return (
     <main>
       <Header />
@@ -84,61 +88,99 @@ function Post({ post }: Props) {
       </article>
       <hr className="max-w-lg mx-auto my-5 border border-yellow-500" />
 
-      <form
-        className="flex flex-col max-w-2xl p-5 mx-auto my-10 mb-10"
-        onSubmit={handleSubmit(onSubmit)}
-      >
-        <h3 className="text-sm text-yellow-500">Enjoy this article?</h3>
-        <h4 className="text-3xl font-bold">Leave a comment below</h4>
-        <hr className="py-3 mt-2" />
-
-        <input type="hidden" {...register('_id')} name="_id" value={post._id} />
-        <label className="block mb-5 ">
-          <span className="text-gray-700">Name</span>
-          <input
-            {...register('name', { required: true })}
-            type="text"
-            placeholder="Want to know you opinion "
-            className="block w-full px-3 py-2 mt-1 border rounded shadow outline-none form-input ring-yellow-500 focus:ring"
-          />
-        </label>
-        <label className="block mb-5 ">
-          <span className="text-gray-700">Email</span>
-          <input
-            {...register('email', { required: true })}
-            type="text"
-            placeholder="Want to know you opinion "
-            className="block w-full px-3 py-2 mt-1 border rounded shadow outline-none form-input ring-yellow-500 focus:ring"
-          />
-        </label>
-        <label className="block mb-5 ">
-          <span className="text-gray-700">Comments</span>
-          <textarea
-            {...register('comment', { required: true })}
-            placeholder="know sometings"
-            rows={8}
-            className="w-full px-3 py-2 mt-1 border rounded shadow outline-none form-textarea ring-yellow-500 focus:ring "
-          />
-        </label>
-
-        {/* Error will show here */}
-        <div className="flex flex-col p-5">
-          {errors.name && (
-            <span className="text-red-500">The Name field is required</span>
-          )}
-          {errors.comment && (
-            <span className="text-red-500">The Comments field is required</span>
-          )}
-          {errors.email && (
-            <span className="text-red-500">The Email field is required</span>
-          )}
+      {submitted ? (
+        <div className="flex flex-col max-w-2xl p-10 mx-auto my-10 text-white bg-yellow-500">
+          <h3 className="text-3xl font-bold ">
+            Thank you for your submitted comments!
+          </h3>
+          <p className="text-sm ">Once it approved, it will appear below!</p>
         </div>
+      ) : (
+        <form
+          className="flex flex-col max-w-2xl p-5 mx-auto my-10 mb-10"
+          onSubmit={handleSubmit(onSubmit)}
+        >
+          <h3 className="text-sm text-yellow-500">Enjoy this article?</h3>
+          <h4 className="text-3xl font-bold">Leave a comment below</h4>
+          <hr className="py-3 mt-2" />
 
-        <input
-          type="submit"
-          className="px-4 py-2 font-bold text-white bg-yellow-500 rounded cursor-pointer focus:shadow-outline hover:bg-yellow-400 focus:outline-none"
-        />
-      </form>
+          <input
+            type="hidden"
+            {...register('_id')}
+            name="_id"
+            value={post._id}
+          />
+          <label className="block mb-5 ">
+            <span className="text-gray-700">Name</span>
+            <input
+              {...register('name', { required: true })}
+              type="text"
+              placeholder="Want to know you opinion "
+              className="block w-full px-3 py-2 mt-1 border rounded shadow outline-none form-input ring-yellow-500 focus:ring"
+            />
+          </label>
+          <label className="block mb-5 ">
+            <span className="text-gray-700">Email</span>
+            <input
+              {...register('email', { required: true })}
+              type="text"
+              placeholder="Want to know you opinion "
+              className="block w-full px-3 py-2 mt-1 border rounded shadow outline-none form-input ring-yellow-500 focus:ring"
+            />
+          </label>
+          <label className="block mb-5 ">
+            <span className="text-gray-700">Comments</span>
+            <textarea
+              {...register('comment', { required: true })}
+              placeholder="know sometings"
+              rows={8}
+              className="w-full px-3 py-2 mt-1 border rounded shadow outline-none form-textarea ring-yellow-500 focus:ring "
+            />
+          </label>
+
+          {/* Error will show here */}
+          <div className="flex flex-col p-5">
+            {errors.name && (
+              <span className="text-red-500">The Name field is required</span>
+            )}
+            {errors.comment && (
+              <span className="text-red-500">
+                The Comments field is required
+              </span>
+            )}
+            {errors.email && (
+              <span className="text-red-500">The Email field is required</span>
+            )}
+          </div>
+
+          <input
+            type="submit"
+            className="px-4 py-2 font-bold text-white bg-yellow-500 rounded cursor-pointer focus:shadow-outline hover:bg-yellow-400 focus:outline-none"
+          />
+        </form>
+      )}
+
+      {/* Comment */}
+
+      <div>
+        {post.comments.map((comment) => {
+          return (
+            <div
+              key={comment._id}
+              className="flex flex-col max-w-2xl p-10 mx-auto my-10 space-y-2 shadow shadow-yellow-500"
+            >
+              <h3 className="text-4xl ">Comments</h3>
+              <hr />
+              <p className="">
+                <span className="font-bold text-yellow-500">
+                  {comment.name}{' '}
+                </span>
+                : {comment.comment}
+              </p>
+            </div>
+          )
+        })}
+      </div>
     </main>
   )
 }
@@ -166,19 +208,20 @@ export const getStaticPaths = async () => {
 }
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
-  const query = `*[_type == 'post'&&slug.current == $slug][0]{
-        _id,
-        _createdAt,
-        title,
-        author->{
-        name,
-        image
-      },
-        description,
-        mainImage,
-        slug,
-        body
-      }`
+  const query = `*[_type == 'post'&& slug.current == $slug][0]{
+    _id,
+    _createdAt,
+    title,
+    author->{
+    name,
+    image
+  },
+  'comments':*[_type == "comment" &&post._ref == ^._id &&approved == true],
+    description,
+    mainImage,
+    slug,
+    body
+  }`
   const post = await sanityClient.fetch(query, {
     slug: params?.slug,
   })
